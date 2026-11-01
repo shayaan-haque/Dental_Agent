@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import AuthPage from "./AuthPage";
+import AppointmentsPanel from "./AppointmentsPanel";
 import { getCurrentUser, logoutUser } from "./authApi";
 import "./styles.css";
 
@@ -15,11 +16,13 @@ const suggestions = [
   ],
 ];
 
-function App({ user, authLoading, authError, logoutPending, onLogout }) {
+function App({ user, authLoading, authError, logoutPending, onLogout, view }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [retrySeconds, setRetrySeconds] = useState(0);
+  const [appointmentsRevision, setAppointmentsRevision] = useState(0);
   const bottom = useRef(null);
   const inputRef = useRef(null);
   const sending = useRef(false);
@@ -27,12 +30,22 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
     bottom.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, error, pending]);
   useEffect(() => {
-    if (!pending) inputRef.current?.focus();
-  }, [pending]);
+    if (!pending && view === "chat") inputRef.current?.focus();
+  }, [pending, view]);
+  useEffect(() => {
+    if (retrySeconds <= 0) return;
+    const timer = setTimeout(() => setRetrySeconds(value => Math.max(0, value - 1)), 1000);
+    return () => clearTimeout(timer);
+  }, [retrySeconds]);
 
   async function send(text = input) {
     const content = text.trim();
     if (!content || sending.current) return;
+    if (authLoading || logoutPending || retrySeconds > 0) return;
+    if (!user) {
+      setError("Please log in to search, book, or cancel appointments.");
+      return;
+    }
     if (content.length > 6000) {
       setError("Please keep your message under 6,000 characters.");
       return;
@@ -52,8 +65,15 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
         body: JSON.stringify({ message: content }),
       });
       if (!response.ok) {
+        if (response.status === 429) {
+          const delay = Number(response.headers.get("Retry-After"));
+          setRetrySeconds(Number.isFinite(delay) && delay > 0 ? Math.min(3600, Math.ceil(delay)) : 60);
+        }
+        const failure = await response.json().catch(() => null);
         throw new Error(
-          `Request failed (${response.status}). Check the backend terminal for details.`
+          typeof failure?.detail === "string"
+            ? failure.detail
+            : `Request failed (${response.status}). Please check your appointments before retrying.`
         );
       }
       const data = await response.json();
@@ -78,6 +98,8 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
     } finally {
       sending.current = false;
       setPending(false);
+      // Refresh even after a failed AI response: a tool may have committed.
+      setAppointmentsRevision(value => value + 1);
     }
   }
 
@@ -97,18 +119,10 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
           </h1>
           <p>Find the right dentist and a time that works for you.</p>
         </div>
-        <button
-          className="new-chat"
-          disabled={pending}
-          onClick={() => {
-            setMessages([]);
-            setError("");
-            setInput("");
-            inputRef.current?.focus();
-          }}
-        >
-          ＋ New conversation
-        </button>
+        <nav className="sidebar-views" aria-label="Main navigation">
+          <a className={view === "chat" ? "selected" : ""} href="#/chat" aria-current={view === "chat" ? "page" : undefined}>✦ Chat</a>
+          <a className={view === "appointments" ? "selected" : ""} href="#/appointments" aria-current={view === "appointments" ? "page" : undefined}>◷ My appointments</a>
+        </nav>
         <div className="sidebar-note">
           <span className="note-icon">◷</span>
           <div>
@@ -117,10 +131,10 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
           </div>
         </div>
         <div className="scope">
-          <span className="pill">AVAILABILITY ASSISTANT</span>
+          <span className="pill">APPOINTMENT ASSISTANT</span>
           <p>
-            Search doctor availability through the AI assistant. Sign in to your
-            account; booking is not available yet.
+            Sign in to find available slots, book a visit, or cancel an appointment.
+            To change a visit, ask the assistant to check a new time first.
           </p>
         </div>
         <div className="sidebar-footer">Built with React + LangGraph</div>
@@ -130,17 +144,21 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
         <header>
           <div>
             <span className="assistant-dot" /> Dental assistant{" "}
-            <span className="header-tag">Chat</span>
+            <span className="header-tag">{view === "appointments" ? "Appointments" : "Chat"}</span>
           </div>
           <div className="chat-header-actions">
+            <nav className="header-view-switch" aria-label="Application views">
+              <a className={view === "chat" ? "selected" : ""} href="#/chat" aria-current={view === "chat" ? "page" : undefined}>Chat</a>
+              <a className={view === "appointments" ? "selected" : ""} href="#/appointments" aria-current={view === "appointments" ? "page" : undefined}>My appointments</a>
+            </nav>
             <span className="connection">
               <i />
-              {pending ? "Processing request…" : "Availability chat"}
+              {pending ? "Processing request…" : "Appointment chat"}
             </span>
             <nav className="account-links" aria-label="Account">
               {authLoading ? <span className="account-name" role="status">Checking login…</span> : user ? <>
                 <span className="account-name" title={user.email}>Hi, {user.name}</span>
-                <button className="logout-button" disabled={logoutPending} onClick={onLogout}>
+                <button className="logout-button" disabled={logoutPending || pending} onClick={onLogout}>
                   {logoutPending ? "Logging out…" : "Log out"}
                 </button>
               </> : <>
@@ -150,7 +168,11 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
             </nav>
           </div>
         </header>
-        <div className="conversation" aria-live="polite" aria-busy={pending}>
+        {view === "appointments" && <>
+          {authError && <div className="error" role="alert">{authError}</div>}
+          <AppointmentsPanel user={user} authLoading={authLoading} revision={appointmentsRevision} />
+        </>}
+        <div hidden={view !== "chat"} className="conversation" aria-live="polite" aria-busy={pending}>
           {!messages.length && (
             <section className="welcome">
               <div className="welcome-symbol">✦</div>
@@ -170,7 +192,7 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
               <div className="suggestions">
                 {suggestions.map(([title, prompt]) => (
                   <button
-                    disabled={pending}
+                    disabled={pending || authLoading || logoutPending || retrySeconds > 0}
                     key={title}
                     onClick={() => send(prompt)}
                   >
@@ -222,7 +244,8 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
             <div ref={bottom} />
           </div>
         </div>
-        <div className="composer-area">
+        <div hidden={view !== "chat"} className="composer-area">
+          {retrySeconds > 0 && <p className="chat-cooldown" role="status">AI cooldown: {retrySeconds}s. You can still open <a href="#/appointments">My appointments</a>.</p>}
           <form
             onSubmit={(event) => {
               event.preventDefault();
@@ -239,7 +262,7 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
               maxLength={6000}
               rows={2}
               placeholder="Ask about available dentists or appointment times…"
-              disabled={pending}
+              disabled={pending || authLoading || logoutPending || retrySeconds > 0}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
                 if (
@@ -257,15 +280,14 @@ function App({ user, authLoading, authError, logoutPending, onLogout }) {
               <button
                 type="submit"
                 aria-label="Send message"
-                disabled={pending || !input.trim()}
+                disabled={pending || authLoading || logoutPending || retrySeconds > 0 || !input.trim()}
               >
                 ↑
               </button>
             </div>
           </form>
           <p className="disclaimer">
-            Each request is independent; the assistant has no conversation
-            memory yet. · Availability does not reserve a slot.
+            Availability does not reserve a slot. A booking is saved only after confirmation.
           </p>
         </div>
       </main>
@@ -322,7 +344,7 @@ function Root() {
       await logoutUser();
       restoreController.current?.abort();
       setUser(null);
-      window.location.hash = "#/chat";
+      window.location.hash = "#/login";
     } catch (error) {
       // Keep the displayed session if the server could not clear its cookie.
       setAuthError(error.message);
@@ -352,7 +374,8 @@ function Root() {
     <>
       <div hidden={mode !== null}>
         <App key={user?.id ?? "guest"} user={user} authLoading={authLoading}
-          authError={authError} logoutPending={logoutPending} onLogout={handleLogout} />
+           authError={authError} logoutPending={logoutPending} onLogout={handleLogout}
+           view={route === "#/appointments" ? "appointments" : "chat"} />
       </div>
 
       {mode && <AuthPage key={mode} mode={mode} onLogin={handleLogin} authLoading={authLoading} />}

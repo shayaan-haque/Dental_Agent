@@ -16,6 +16,7 @@ def get_available_slots(
     date_filter: str | date | None = None,
     limit: int = 20,
     timezone: str = "Asia/Kolkata",
+    time_filter: str | None = None,
 ) -> list[dict]:
     """Return available slots, earliest first, without modifying the database.
 
@@ -23,7 +24,8 @@ def get_available_slots(
     Doctor names support case-insensitive partial matches; specializations
     match exactly after lowercasing and replacing spaces/hyphens with underscores.
     date_filter accepts YYYY-MM-DD or a date object and means a calendar day
-    in the supplied IANA timezone. Returned timestamps use that timezone.
+    in the supplied IANA timezone. time_filter (HH:MM, 24-hour) requires a date
+    and filters BEFORE limiting results. Returned timestamps use that timezone.
 
     Availability requires an active doctor, an enabled future slot, and no
     appointment with status 'booked'. This is a snapshot, not a reservation.
@@ -58,6 +60,15 @@ def get_available_slots(
             target_date = date_filter
         else:
             raise ValueError("date_filter must be a YYYY-MM-DD string or a date object")
+
+    target_time = None
+    if time_filter is not None:
+        if target_date is None or not isinstance(time_filter, str):
+            raise ValueError("time_filter requires date_filter and must use HH:MM")
+        try:
+            target_time = datetime.strptime(time_filter, "%H:%M").time()
+        except ValueError as exc:
+            raise ValueError("time_filter must use HH:MM (24-hour)") from exc
 
     # NOT EXISTS excludes booked slots without duplicating rows from history.
     has_booking = select(Appointment.id).where(
@@ -103,6 +114,9 @@ def get_available_slots(
             AppointmentSlot.start_time >= day_start,
             AppointmentSlot.start_time < day_end,
         )
+        if target_time is not None:
+            requested_start = datetime.combine(target_date, target_time, tzinfo=local_timezone)
+            query = query.where(AppointmentSlot.start_time == requested_start)
 
     query = query.order_by(AppointmentSlot.start_time, Doctor.id, AppointmentSlot.id).limit(limit)
     with SessionLocal() as session:

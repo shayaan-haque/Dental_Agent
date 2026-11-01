@@ -1,4 +1,4 @@
-langgraph>=0.2.0
+langgraph>=1.0.0
 langchain>=0.3.0
 langchain-core>=0.3.0
 langchain-xai>=0.2.0
@@ -9,3 +9,8 @@ langchain-groq
 sqlalchemy>=2.0
 psycopg[binary]>=3.1
 alembic>=1.13
+fastapi>=0.115
+uvicorn>=0.30
+PyJWT>=2.9
+pwdlib[argon2]>=0.2
+email-validator>=2.2

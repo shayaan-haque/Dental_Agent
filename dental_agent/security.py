@@ -1,5 +1,6 @@
 from pwdlib import PasswordHash
 import os
+from uuid import uuid4
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -25,6 +26,7 @@ def create_access_token(user_id: int) -> str:
         "iat": now,
         "exp": now + timedelta(minutes=ACCESS_TOKEN_MINUTES),
         "token_type": "access",
+        "jti": str(uuid4()),
     }
 
     return jwt.encode(
@@ -34,7 +36,7 @@ def create_access_token(user_id: int) -> str:
     )
 
 
-def decode_access_token(token: str) -> int:
+def decode_access_token_claims(token: str) -> dict:
     payload = jwt.decode(
         token,
         JWT_SECRET_KEY,
@@ -57,7 +59,11 @@ def decode_access_token(token: str) -> int:
     ):
         raise jwt.InvalidTokenError("Invalid token subject")
 
-    return int(subject)
+    return payload
+
+
+def decode_access_token(token: str) -> int:
+    return int(decode_access_token_claims(token)["sub"])
 
 
 def hash_password(password: str) -> str:

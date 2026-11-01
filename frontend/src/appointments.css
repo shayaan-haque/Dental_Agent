@@ -1,0 +1,48 @@
+[hidden] { display: none !important; }
+.sidebar-views { display: grid; gap: 8px; margin-top: 22px; }
+.sidebar-views a { padding: 12px 14px; border: 1px solid #628176; border-radius: 9px; text-decoration: none; font-size: 13px; }
+.sidebar-views a:hover, .sidebar-views a.selected { background: #ffffff12; border-color: #c9e5a0; }
+.header-view-switch { display: flex; gap: 4px; }
+.header-view-switch a { text-decoration: none; color: #536c5b; padding: 8px 10px; border-radius: 7px; font-size: 12px; white-space: nowrap; }
+.header-view-switch a.selected { background: #e8efdf; color: #244d3b; }
+.appointments-panel { flex: 1; overflow-y: auto; padding: 36px 44px; }
+.appointments-heading { max-width: 950px; margin: 0 auto 26px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+.appointments-heading .eyebrow { color: #7c8a70; }
+.appointments-heading h2 { font-family: Manrope, sans-serif; font-size: 32px; letter-spacing: -1px; font-weight: 600; margin: 10px 0; }
+.appointments-heading p, .appointments-note { font-size: 13px; color: #71806c; line-height: 1.7; }
+.appointments-refresh, .appointment-pagination button { border: 1px solid #cfdbc7; border-radius: 7px; background: #fcfdfb; padding: 9px 12px; color: #31563e; font-size: 12px; }
+.appointment-filters { max-width: 950px; margin: 0 auto 24px; display: flex; gap: 8px; flex-wrap: wrap; }
+.appointment-filters button { border: 1px solid #d5dfcf; border-radius: 20px; padding: 9px 17px; background: #fcfdfb; color: #5d7056; font-size: 13px; }
+.appointment-filters button.selected { background: #214d3f; border-color: #214d3f; color: white; }
+.appointment-list { list-style: none; padding: 0; max-width: 950px; margin: auto; display: grid; gap: 14px; }
+.appointment-card { border: 1px solid #dce4d5; border-radius: 13px; background: #fcfdfb; padding: 22px; }
+.appointment-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.appointment-number { color: #7b896f; font-size: 9px; letter-spacing: 1.3px; margin: 0 0 10px; }
+.appointment-card h3 { font-family: Manrope, sans-serif; font-size: 18px; margin: 0 0 6px; }
+.appointment-specialty { color: #73816c; font-size: 12px; margin: 0; text-transform: capitalize; }
+.appointment-status { padding: 5px 9px; border-radius: 5px; font-size: 11px; text-transform: capitalize; background: #e7efe0; color: #3d6534; }
+.status-cancelled { background: #faeae1; color: #9c542d; }
+.status-completed, .status-rescheduled { background: #e8edf0; color: #526c7a; }
+.appointment-time { display: flex; flex-wrap: wrap; gap: 8px 24px; border-top: 1px solid #e7ecdf; margin-top: 18px; padding-top: 15px; font-size: 13px; }
+.appointment-time span { color: #6b7a64; }
+.appointments-empty { max-width: 950px; margin: auto; text-align: center; padding: 50px 20px; border: 1px dashed #d1ddc7; border-radius: 13px; }
+.appointments-empty > span { color: #78965d; font-size: 35px; }
+.appointments-empty h3 { font-size: 18px; font-weight: 500; }
+.appointments-empty p { color: #74816b; font-size: 13px; }
+.appointments-empty a { display: inline-block; margin-top: 12px; font-size: 13px; color: #315d42; }
+.appointments-loading, .appointments-panel .error { max-width: 950px; margin: 20px auto; }
+.appointment-pagination { max-width: 950px; margin: 22px auto; display: flex; justify-content: center; align-items: center; gap: 18px; font-size: 12px; }
+.appointments-note { max-width: 950px; margin: 24px auto 0; }
+.chat-cooldown { max-width: 850px; margin: 8px auto; font-size: 12px; color: #89603e; }
+.chat-cooldown a { font-weight: 600; }
+@media (max-width: 1200px) { .chat-header-actions .connection { display: none; } }
+@media (max-width: 900px) { .appointments-panel { padding: 26px 24px; } }
+@media (max-width: 700px) {
+  .main-panel > header { height: auto; min-height: 95px; flex-wrap: wrap; gap: 8px; padding: 12px 18px; }
+  .main-panel > header .chat-header-actions { width: 100%; justify-content: space-between; }
+  .header-view-switch a { font-size: 11px; padding: 7px 8px; }
+  .appointments-panel { padding: 24px 16px; }
+  .appointments-heading h2 { font-size: 27px; }
+  .appointment-card { padding: 17px; }
+  .appointment-filters button { padding: 8px 12px; font-size: 12px; }
+}
