@@ -1,10 +1,10 @@
-from mcp.server import MCPServer
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Dental Appointment MCP")
 
 from dental_agent.services.availability import (
     get_available_slots as fetch_available_slots
 )
-
-mcp = MCPServer("Dental Appointment MCP")
 
 
 @mcp.tool()
@@ -25,6 +25,5 @@ def get_available_slots(
         limit=limit,
     )
 
-
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="stdio")
