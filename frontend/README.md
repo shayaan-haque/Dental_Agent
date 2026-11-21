@@ -167,6 +167,21 @@ already enabled. They create/drop only their own randomly named test schema.
 Set `BOOKING_TEST_BACKEND=postgres` as well to run the behavior suite against
 that PostgreSQL database instead of the default isolated SQLite database.
 
+To run the focused two-user booking race tests (PostgreSQL required):
+
+```bash
+TEST_DATABASE_URL="postgresql+psycopg://USER:PASSWORD@localhost/TEST_DATABASE" \
+  python -m pytest tests/test_concurrent_booking.py -v -s
+```
+
+These run 50 two-user service races, verify an actual PostgreSQL lock wait,
+and run 10 concurrent pairs of authenticated `/api/chat` requests. Each slot
+must have exactly one saved booking and one rejection, with no false success
+shown to the losing user. The API test scripts only the external LLM; real
+JWT validation, graph tools, database operations, and reply formatting run.
+The MCP proof of concept is not involved, and no AI quota is consumed. Test
+data stays in the fixture's temporary schema, which is dropped after each test.
+
 Run frontend request-helper tests without contacting the backend:
 
 ```bash

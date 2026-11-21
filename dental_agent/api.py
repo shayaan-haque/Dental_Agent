@@ -1,4 +1,5 @@
 import logging
+import os
 from math import ceil
 
 import jwt
@@ -32,6 +33,7 @@ from dental_agent.schemas.appointments import AppointmentListResponse, Appointme
 from dental_agent.response_formatter import build_action_reply
 
 logger = logging.getLogger(__name__)
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 app = FastAPI(title = "Dental Appointemnt System")
 
@@ -158,7 +160,7 @@ def login(request: LoginRequest, response: Response):
         key="access_token",
         value=token,
         httponly=True,
-        secure=False,  # Local HTTP development only.
+        secure=COOKIE_SECURE,
         samesite="lax",
         max_age=ACCESS_TOKEN_MINUTES * 60,
         path="/",
@@ -184,7 +186,7 @@ def logout(response: Response, access_token: str | None = Cookie(default=None)):
         key="access_token",
         path="/",
         httponly=True,
-        secure=False,  # Local HTTP development only.
+        secure=COOKIE_SECURE,
         samesite="lax",
     )
 
