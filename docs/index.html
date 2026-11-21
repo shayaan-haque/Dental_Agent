@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Watch two short demonstrations of the Dental Appointment Agent.">
+  <title>Video walkthroughs · Dental Appointment Agent</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --forest: #15382e;
+      --ink: #19352c;
+      --muted: #4b6257;
+      --leaf: #d7edaf;
+      --border: #d9e4d8;
+      --paper: #f2f6ee;
+      font-family: "Avenir Next", Avenir, system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
+    header { background: var(--forest); color: #f5faed; padding: 38px 0 49px; }
+    header a { color: var(--leaf); font-size: .9rem; font-weight: 600; }
+    h1 { margin: 26px 0 8px; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.08; letter-spacing: -.035em; }
+    header p { margin: 0; color: #e2eddb; }
+    main { padding: 28px 0 44px; }
+    .videos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+    article { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 16px; background: #fff; scroll-margin-top: 14px; }
+    video { display: block; width: 100%; aspect-ratio: 16 / 9; background: var(--forest); }
+    .details { padding: 19px 21px 23px; }
+    .title { display: flex; gap: 12px; justify-content: space-between; align-items: baseline; }
+    h2 { margin: 0; font-size: 1.28rem; line-height: 1.28; }
+    .time { color: var(--muted); font-size: .88rem; white-space: nowrap; }
+    .details p { color: var(--muted); margin: 9px 0 14px; line-height: 1.65; }
+    .details a { color: #1b6146; font-weight: 650; font-size: .92rem; }
+    a { text-underline-offset: .24em; }
+    a:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+    @media (max-width: 720px) {
+      .videos { grid-template-columns: 1fr; }
+      header { padding: 29px 0 34px; }
+      .wrap { width: min(100% - 28px, 1120px); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a href="https://github.com/shayaan-haque/Dental_Agent#video-walkthroughs">Dental Appointment Agent on GitHub</a>
+      <h1>Video walkthroughs</h1>
+      <p>Two short demos of booking and finding a saved appointment.</p>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="videos">
+      <article id="aws-walkthrough" aria-labelledby="aws-title">
+        <video controls playsinline preload="metadata" poster="demo/aws-walkthrough-preview.jpg" aria-label="AWS deployment walkthrough">
+          <source src="demo/dental-agent-aws-walkthrough.mp4" type="video/mp4">
+          <a href="demo/dental-agent-aws-walkthrough.mp4" download>Download the AWS deployment walkthrough</a>
+        </video>
+        <div class="details">
+          <div class="title"><h2 id="aws-title">AWS deployment walkthrough</h2><span class="time">1:00</span></div>
+          <p>See the sign-in screens, find a dentist through chat, book a visit, and verify it in My appointments.</p>
+          <a href="demo/dental-agent-aws-walkthrough.mp4" download>Download MP4</a>
+        </div>
+      </article>
+      <article id="phone-to-laptop" aria-labelledby="phone-title">
+        <video controls playsinline preload="metadata" poster="demo/phone-to-laptop-preview.jpg" aria-label="Phone-to-laptop booking demo">
+          <source src="demo/dental-agent-phone-to-laptop.mp4" type="video/mp4">
+          <a href="demo/dental-agent-phone-to-laptop.mp4" download>Download the phone-to-laptop booking demo</a>
+        </video>
+        <div class="details">
+          <div class="title"><h2 id="phone-title">Phone-to-laptop booking</h2><span class="time">0:31</span></div>
+          <p>Book a visit on a phone. Then sign in to the same account on a laptop and see the same saved booking.</p>
+          <a href="demo/dental-agent-phone-to-laptop.mp4" download>Download MP4</a>
+        </div>
+      </article>
+    </div>
+  </main>
+</body>
+</html>
