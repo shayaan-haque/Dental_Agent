@@ -4,8 +4,12 @@ A web app for finding available dentists, booking a visit through chat, and view
 
 ## Video walkthroughs
 
-- [AWS deployment walkthrough (1:00)](docs/demo/dental-agent-aws-walkthrough.mp4) — Sign in, check availability, and book a visit through the assistant.
-- [Phone-to-laptop booking demo (0:31)](docs/demo/dental-agent-phone-to-laptop.mp4) — Book a visit on a phone, then sign in to the same account on a laptop to see the saved appointment.
+[Watch both walkthroughs in your browser](https://shayaan-haque.github.io/Dental_Agent/)
+
+- **AWS deployment walkthrough (1:00)** — Sign in, search for an available dentist, book a visit, and see it in My appointments. [Download MP4](docs/demo/dental-agent-aws-walkthrough.mp4)
+- **Phone-to-laptop booking demo (0:31)** — Book on a phone, then sign in on a laptop to see the same saved appointment. [Download MP4](docs/demo/dental-agent-phone-to-laptop.mp4)
+
+[Read the video descriptions and download instructions](docs/demo/README.md).
 
 ## Demo deployment
 

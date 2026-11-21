@@ -14,6 +14,10 @@ The user books an appointment with John Doe on a phone. On the laptop, they sign
 
 [Open the phone-to-laptop MP4 on GitHub](dental-agent-phone-to-laptop.mp4)
 
-## Download a copy
+## Watch in your browser
+
+Open the [video walkthrough page](https://shayaan-haque.github.io/Dental_Agent/) and press **Play** on either clip. Use **Download MP4** below the player if you'd like to save a copy.
+
+## Download from the repository
 
 On either GitHub file page, choose **Download raw file** and open the saved MP4 in your browser or video player.
